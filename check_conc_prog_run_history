@@ -20,5 +20,5 @@ AND   fr.PROGRAM_APPLICATION_ID = fp.APPLICATION_ID
 AND ft.concurrent_program_id=fr.concurrent_program_id
 AND fr.REQUESTED_BY=fu.user_id
 AND fv.request_id=fr.request_id
-and ft.user_concurrent_program_name like 'XXAT Software Auto Classification Program'
+and ft.user_concurrent_program_name like '<Prog Name>'
 order by to_char(fr.ACTUAL_COMPLETION_DATE,'dd-MON-yy hh24:mi:ss') desc; 
