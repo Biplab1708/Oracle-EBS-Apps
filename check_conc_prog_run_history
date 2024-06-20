@@ -1,0 +1,24 @@
+--Query To Check Concurrent Program Run History    
+SELECT distinct ft.user_concurrent_program_name "Conc Program Name",
+fr.REQUEST_ID "Request ID",
+to_char(fr.ACTUAL_START_DATE,'dd-MON-yy hh24:mi:ss') "Started at",
+to_char(fr.ACTUAL_COMPLETION_DATE,'dd-MON-yy hh24:mi:ss') "Completed at",
+decode(fr.PHASE_CODE,'C','Completed','I','Inactive','P','Pending','R','Running','NA') "Phasecode",
+decode(fr.STATUS_CODE, 'A','Waiting', 'B','Resuming', 'C','Normal', 'D','Cancelled', 'E','Error', 'F','Scheduled', 'G','Warning', 'H','On Hold', 'I','Normal', 'M',
+'No Manager', 'Q','Standby', 'R','Normal', 'S','Suspended', 'T','Terminating', 'U','Disabled', 'W','Paused', 'X','Terminated', 'Z','Waiting') "Status",fr.argument_text "Parameters",
+fu.user_name "Username",
+round(((nvl(fv.actual_completion_date,sysdate)-fv.actual_start_date)*24*60),2) "ElapsedTime(Mins)"
+FROM
+apps.fnd_concurrent_requests fr ,
+apps.fnd_concurrent_programs fp ,
+apps.fnd_concurrent_programs_tl ft,
+apps.fnd_user fu, apps.fnd_conc_req_summary_v fv
+WHERE 
+fr.CONCURRENT_PROGRAM_ID = fp.CONCURRENT_PROGRAM_ID
+AND fr.actual_start_date >= (sysdate - 180)
+AND   fr.PROGRAM_APPLICATION_ID = fp.APPLICATION_ID
+AND ft.concurrent_program_id=fr.concurrent_program_id
+AND fr.REQUESTED_BY=fu.user_id
+AND fv.request_id=fr.request_id
+and ft.user_concurrent_program_name like 'XXAT Software Auto Classification Program'
+order by to_char(fr.ACTUAL_COMPLETION_DATE,'dd-MON-yy hh24:mi:ss') desc; 
