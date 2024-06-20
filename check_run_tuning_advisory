@@ -1,0 +1,52 @@
+select sql_fulltext from gv$sql where sql_id='9cjd7wujw47qb';
+select sql_fulltext from gv$sqlarea where sql_id='9cjd7wujw47qb';
+
+Create Task:-
+DECLARE
+l_sql_tune_task_id VARCHAR2(100);
+BEGIN
+l_sql_tune_task_id := DBMS_SQLTUNE.create_tuning_task (
+sql_id => 'sql_id',
+scope => DBMS_SQLTUNE.scope_comprehensive,
+time_limit => 500,
+task_name => 'task_name',
+description => 'Tuning task1 for statement sql_id');
+DBMS_OUTPUT.put_line('l_sql_tune_task_id: ' || l_sql_tune_task_id);
+END;
+/
+
+Run the task:-
+EXEC DBMS_SQLTUNE.execute_tuning_task(task_name => 'task_name');
+
+See the recommendation:-
+set long 65536
+set longchunksize 65536
+set linesize 100
+set pages 10000
+select dbms_sqltune.report_tuning_task('task_name') from dual;
+
+Drop the Tuning task:-
+execute dbms_sqltune.drop_tuning_task('task_name');
+
+Assign the profile to the sql_id:-
+execute dbms_sqltune.accept_sql_profile(task_name => '0t96qyuj5cry2_potst', task_owner => 'SYS', replace => TRUE,  force_match=>true);
+select * from dba_sql_profile;
+
+Error:-
+Timeout Error while generating the tuning task:-
+Error: ORA-13639: The current operation was interrupted because it timed out.
+-------------------------------------------------------------------------------
+select parameter_name, parameter_value from dba_advisor_parameters where task_name = 'SYS_AUTO_SQL_TUNING_TASK'   
+and parameter_name in ('TIME_LIMIT','DEFAULT_EXECUTION_TYPE','LOCAL_TIME_LIMIT'); 
+
+begin   
+DBMS_SQLTUNE.SET_TUNING_TASK_PARAMETER(task_name => 'SYS_AUTO_SQL_TUNING_TASK', parameter => 'TIME_LIMIT', value => 7200);   
+end;
+/ 
+
+NOTE:
+SQL Tuning advisor is not applicable for statements like PL/SQL procedures or exec commands or declare statements
+execute dbms_sqltune.create_sql_plan_baseline(task_name => 'task_name', owner_name => 'SYS', plan_hash_value => 1234567890);
+select * from DBA_SQLSET_STATEMENTS where sql_id='sql_id';
+execute dbms_sqltune.accept_sql_profile(task_name => 'task_name', task_owner => 'SYS', replace => TRUE, profile_type => DBMS_SQLTUNE.PX_PROFILE);
+execute dbms_sqltune.drop_sql_profile(name => 'coe_script');
