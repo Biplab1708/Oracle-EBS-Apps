@@ -1,0 +1,17 @@
+~~ Query To Check Concurrent Program Details
+select distinct a.user_concurrent_program_name,a.concurrent_program_id,
+b.concurrent_program_name, c.executable_name,c.creation_date executable_created_on,
+u1.user_name executable_created_by,c.last_update_date executable_updated_on ,
+u2.user_name executable_updated_by ,
+execution_file_name, d.meaning file_type
+from apps.fnd_concurrent_programs_tl a, apps.fnd_concurrent_programs b,
+apps.fnd_executables c, apps.fnd_lookups d,apps.fnd_user u1,apps.fnd_user u2
+where 1=1
+and a.language='US'
+and a.concurrent_program_id=b.concurrent_program_id
+and b.executable_id=c.executable_id
+and d.lookup_code=c.execution_method_code
+and c.created_by = u1.user_id
+and c.last_updated_by = u2.user_id
+and d.lookup_type like 'CP_EXECUTION_METHOD_CODE'
+and a.user_concurrent_program_name like ('Broadcom Ireland VAT Validation Program');
