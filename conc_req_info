@@ -1,0 +1,12 @@
+Check the Running Concurrent request status 
+However, you can add more columns from gv$session/fnd_concrruent_processes tables as per your requirement
+
+SELECT distinct a.request_id,d.sid,d.serial#, d.inst_id, d.osuser,d.process, d.sql_id,d.status
+FROM apps.fnd_concurrent_requests a,
+apps.fnd_concurrent_processes b, gv$process c, gv$session d
+WHERE a.controlling_manager = b.concurrent_process_id
+AND c.pid = b.oracle_process_id
+AND b.session_id=d.audsid
+AND a.request_id = 740630048       
+AND a.phase_code = 'R'
+order by 2;
