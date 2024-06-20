@@ -1,4 +1,4 @@
-~ find the blocking sessions ~
+#find the blocking sessions:
 SELECT 'alter system kill session '''|| b.sid ||','|| b.serial# || ',@'||b.inst_id||''' immediate;' 
 FROM GV$LOCKED_OBJECT A ,
 GV$SESSION B,
@@ -8,7 +8,7 @@ AND UPPER(OBJECT_NAME) = '<object_name>'
 and b.status='ACTIVE'
 AND A.OBJECT_ID = C.OBJECT_ID;
 
-~ find the orphan sessions ~
+#find the orphan sessions:
 select distinct a.inst_id, a.sid, b.serial#, b.sql_id, b.schemaname, b.status, b.last_call_et,
 'alter system kill session ' || '''' || a.sid || ',' || b.serial# ||',@'|| a.inst_id || '''' || ' immediate;' "KILL COMMAND" from gv$access a, gv$session b 
 where a.sid=b.sid and a.inst_id=b.inst_id and a.object in ('<object_name>') order by b.status;
