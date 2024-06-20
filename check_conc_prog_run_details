@@ -1,0 +1,17 @@
+~ check concurrent program run details ~
+select distinct a.request_id REQ_ID, to_char(s.inst_id) x_Inst_id, s.sid||', '||s.serial# SID_SER,
+s.sql_id, a.oracle_process_id, p.spid,a.concurrent_program_name PROGNAME,a.user_concurrent_program_name PROGDESC,
+to_char(a.requested_start_date,'MM/DD hh24:mi') start_date, to_char(a.actual_start_date,'MM/DD hh24:mi') actual_start,
+u.user_name SUBMITTED_BY, q.user_concurrent_queue_name QUEUE_NAME,argument_text Arguments
+from applsys.fnd_user u, gv$session s, gv$process p,
+apps.fnd_concurrent_queues_vl q, apps.fnd_concurrent_processes prc,
+apps.fnd_concurrent_worker_requests a, apps.fnd_lookups b
+where 1 = 1 and a.phase_code = 'R' and a.status_code = b.lookup_code
+and b.lookup_type = 'CP_STATUS_CODE' and a.oracle_process_id = p.spid (+)
+and p.addr = s.paddr (+) and a.requested_by = u.user_id
+and a.controlling_manager = prc.concurrent_process_id
+and p.inst_id=s.inst_id(+)
+and prc.concurrent_queue_id = q.concurrent_queue_id 
+and a.request_id=727727060
+order by to_char(a.actual_start_date,'MM/DD hh24:mi')
+/
